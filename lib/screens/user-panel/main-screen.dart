@@ -13,6 +13,8 @@ import 'package:groceryapp/widgets/flash-sale-widget.dart';
 import 'package:groceryapp/widgets/heading-widget.dart';
 
 import '../../utils/app-constant.dart';
+import '../../widgets/all-product-widget.dart';
+import 'all-product-screen.dart';
 
 class MainScreens extends StatefulWidget {
   const MainScreens({super.key});
@@ -65,10 +67,11 @@ class _MainScreensState extends State<MainScreens> {
                 headingSubTitle: "According to your budget!",
                 headingTitle: "All Product",
                 onTap: (){
-                  Get.to(()=>AllFlashSaleProductScreen());
+                  Get.to(()=>AllProductScreen());
                 },
                 buttonText: "See More",
               ),
+              AllProductWidget(),
             ],
           ),
         ),

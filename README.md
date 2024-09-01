@@ -220,6 +220,62 @@ AllFlashSaleProduct jaise hum log category ko kiye the same vaise hi flash sale 
 hme vha condition dena hoga wher('isSale',isEqualTo:true).get()
 phir hme productModel ko fetch karna hai bs etna hi aage aap khud kar loge
 
+Step 24 :(Yaha par hum main screen pr product ko show karana dekhenge)
+----------------------------------------
+hme sbse phle ek widget bnana hai allproductwidget name ka and uske ander hme ek query kya lgana hai jaise hmara jo sale ka product hai vh hme show na ho 
+aur jo sale me product hai vh hme dikhayi de bs ('isSale',isEqualTo:false).get() ye query lgana hai and hme gridview lena hai uske andr kuch ui design karna hai bs 
+ 2. ab hme see more par click kare to all product show ho next screen par to eske liye kya karenge hum 
+3. sabse pahle ek screen bnaana hai allproductscreen name se and usme allproductwidget ko copy karna hai bs name ko change kar dena hai aur kuch nhi
+
+Step 25 :(agr hum kisi spacefic product pr click kre to usko kaise detail screen pr le ja sake)
+----------------------------------
+sabse phle hme kisi product pr click event bnana hoga and jab product pr click kare to product ka data hme dusre 
+screen par le jana hai model ke basis par
+(productModel:productModel)
+dusre screen pr ProductModel productModel; required this.productModel;
+1. Ab hme slider ko lgana hai to hum sabse phle banner widget ke andr slider ko copy karenge phir use hum singleproductscreen pr column ke andr paste karenge
+hme crouselslider ke ander ek attribute hai item name ka uske andr hme yah pass karna hai (items: widget.productModel.productImages.)
+2. phir eske baad hme categoryname,price,delivery,description,and favorite icon,and 2 button dena hai Add to cart , and Whatsapp ka.
+
+
+Step 26 : (Esme hum yeh dekhenge ki agr hum kisi flash sale product pr click kr rhe h to uske product ko details screen par kaise dikhayenge)
+--------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
