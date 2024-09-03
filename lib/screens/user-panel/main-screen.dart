@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:groceryapp/screens/auth-ui/welcome-screen.dart';
 import 'package:groceryapp/screens/user-panel/all-categories-screen.dart';
 import 'package:groceryapp/screens/user-panel/all-flash-sale-product.dart';
+import 'package:groceryapp/screens/user-panel/cart-screen.dart';
 import 'package:groceryapp/widgets/banners-widget.dart';
 import 'package:groceryapp/widgets/category-widget.dart';
 import 'package:groceryapp/widgets/custom-drawer-widget.dart';
@@ -30,6 +31,17 @@ class _MainScreensState extends State<MainScreens> {
       appBar: AppBar(
         title: Text(AppConstant.appName),
         backgroundColor:AppConstant.appMainColor,
+        actions: [
+          GestureDetector(
+            onTap: (){
+              Get.to(()=>CartScreen());
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.shopping_cart),
+            ),
+          ),
+        ],
       ),
       drawer: DrawerWidget(),
       body: SingleChildScrollView(

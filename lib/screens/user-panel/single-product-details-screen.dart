@@ -1,13 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:groceryapp/modals/cart-model.dart';
 import 'package:groceryapp/modals/product-model.dart';
 import 'package:groceryapp/utils/app-constant.dart';
 
 import '../../controllers/banners-controller.dart';
+import 'cart-screen.dart';
 class SingleProductScreen extends StatefulWidget {
   ProductModel productModel;
    SingleProductScreen({super.key, required this.productModel});
@@ -19,12 +23,25 @@ class SingleProductScreen extends StatefulWidget {
 class _SingleProductScreenState extends State<SingleProductScreen> {
   final CarouselController carouselController=CarouselController();
 
+  User? user=FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppConstant.appMainColor,
         title: Text(widget.productModel.productName),
+        actions: [
+          GestureDetector(
+            onTap: (){
+              Get.to(()=>CartScreen());
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.shopping_cart),
+            ),
+          ),
+        ],
       ),
       body: Container(
         child: Column(
@@ -77,7 +94,12 @@ class _SingleProductScreenState extends State<SingleProductScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                         alignment: Alignment.topLeft,
-                        child: Text("Price : "+widget.productModel.fullPrice)),
+                        child: Row(
+                          children: [
+                            widget.productModel.isSale==true && widget.productModel.salePrice!=''?
+                            Text("Price : "+widget.productModel.salePrice):Text("Price : "+widget.productModel.fullPrice),
+                          ],
+                        )),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -107,8 +129,9 @@ class _SingleProductScreenState extends State<SingleProductScreen> {
                             ),
                             child: TextButton(
                               child: Text('Add to cart',style: TextStyle(color: AppConstant.appTextColor),),
-                              onPressed: (){
+                              onPressed: () async{
                                 //Get.to(()=> SignScreen());
+                               await checkProductExistence(uId:user!.uid);
                               },
                             ),
                           ),
@@ -140,5 +163,74 @@ class _SingleProductScreenState extends State<SingleProductScreen> {
         ),
       ),
     );
+  }
+  //check product exist or not
+
+  Future<void> checkProductExistence({
+    required String uId,
+    int quantityIncrement=1,
+  }) async{
+    //hme hr bande ko usi ke cart ke product dikhane mtlb ki uska  ek document bnayenge
+    //alg alg user ka alg alg documnet hoga and eska collection
+    final DocumentReference documentReference=
+     FirebaseFirestore.instance
+        .collection('cart')
+        .doc(uId)
+        .collection('CartOrders')
+        .doc(widget.productModel.productId.toString());
+
+    //snapshot ke ander hmne document ko get kar lena hai
+    DocumentSnapshot snapshot=await documentReference.get();
+
+    //agr hmara product add ho jayega cart screen me to hum bs uske quantity ko update karenge
+    if(snapshot.exists){
+      int currentQuantity=snapshot['productQuantity'];
+      int updateQuantity=currentQuantity + quantityIncrement;
+      double totalPrice=
+          double.parse(widget.productModel.isSale? widget.productModel.salePrice:widget.productModel.fullPrice)*updateQuantity;
+
+      await documentReference.update({
+        'productQuantity':updateQuantity,
+        'productTotalPrice':totalPrice,
+      });
+      Get.snackbar("Product", "Product already add in cart screen!",
+          snackPosition: SnackPosition.BOTTOM,backgroundColor: AppConstant.appMainColor,
+          colorText: AppConstant.appTextColor
+      );
+      
+    }else{
+      //jb hmara product exist nhi karta cart me tb use hme database me send karne ke liye
+      //this is a subcollaction
+      await FirebaseFirestore.instance.collection('cart').doc(uId).set({
+          'uId':uId,
+        'createdAt':DateTime.now(),
+      });
+      //yeh cart collaction ke andr ek aur collaction bnayega order
+
+      CartModel cartModel=CartModel(
+          productId: widget.productModel.productId,
+          categoryId: widget.productModel.categoryId,
+          productName: widget.productModel.productName,
+          categoryName: widget.productModel.categoryName,
+          salePrice: widget.productModel.salePrice,
+          fullPrice: widget.productModel.fullPrice,
+          productImages: widget.productModel.productImages,
+          deliveryTime: widget.productModel.deliveryTime,
+          isSale: widget.productModel.isSale,
+          productDescription: widget.productModel.productDescription,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          productQuantity: 1,
+          productTotalPrice: double.parse(widget.productModel.isSale? widget.productModel.salePrice:widget.productModel.fullPrice),
+      );
+
+      await documentReference.set(cartModel.toMap());
+      Get.snackbar("Product", "Product added in cart screen!!",
+          snackPosition: SnackPosition.BOTTOM,backgroundColor: AppConstant.appMainColor,
+          colorText: AppConstant.appTextColor
+      );
+
+    }
+
   }
 }

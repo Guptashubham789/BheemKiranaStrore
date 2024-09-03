@@ -240,6 +240,234 @@ hme crouselslider ke ander ek attribute hai item name ka uske andr hme yah pass 
 
 Step 26 : (Esme hum yeh dekhenge ki agr hum kisi flash sale product pr click kr rhe h to uske product ko details screen par kaise dikhayenge)
 --------------------------------------------------------------------------------------
+1. sabse phle jana hai flash widget pr vha se hme productmodel ko send karna h singlproductscreen pr
+2. hme kuch nhi karna bs condition lgana hai price pr
+3. Container(
+   alignment: Alignment.topLeft,
+   child: Row(
+   children: [
+    //agr hmari condition true hogi to sale ki price return hogi agr condition true nhi hogi to fullprice return hogi
+   widget.productModel.isSale==true && widget.productModel.salePrice!=''?
+   Text("Price : "+widget.productModel.salePrice):Text("Price : "+widget.productModel.fullPrice),
+   ],
+   )),
+4. ab hme sab product ko dekh lena hai click krke ki sab product hmara details screen par jaa rha hai ya nhi 
+   agr nhi jaa rha hai to use hum shi kar lenge 
+
+Step 27 :(cart screen jab hum add to cart kare to hmara product cart screen me aa jaaye )
+---------------------------------------------------------------
+1. ek screen bnana hai cartscreen.dart usme statefullwidget lena hai
+2. aur esme hum scaffold return karwayenge and body me hum Listview.builder return karenge uske andr hum ListTile return karenge phir cart ka design karenge 
+3. phir hum ek widget lenge bottomNavigationBar jo ki niche hme ek button and total ammount calculate karke dikhe
+
+Step 28 : (esme hum yeh dekhenge ki kisi product par jaake add tocart karte hai to usko kaise cart screen me add karenge)
+------------------------------------------------------------------
+1. sabse phle hme model bnana hai same product ki trh hi rhega bs esme 2 cheeje aur add karni hai (
+2. final int productQuantity; final double productTotalPrice;)
+3. hme singleproductdetails par jana hai vha par ek method bnana hai and usse  phle hme current user ka instance lena hai
+4. Future<void> checkProductExistence({
+   required String uId,
+   int quantityIncrement=1,
+   }) async{
+   //hme hr bande ko usi ke cart ke product dikhane mtlb ki uska  ek document bnayenge
+   //alg alg user ka alg alg documnet hoga and eska collection
+   final DocumentReference documentReference=
+   FirebaseFirestore.instance
+   .collection('cart')
+   .doc(uId)
+   .collection('CartOrders')
+   .doc(widget.productModel.productId.toString());
+
+   //snapshot ke ander hmne document ko get kar lena hai
+   DocumentSnapshot snapshot=await documentReference.get();
+
+   //agr hmara product add ho jayega cart screen me to hum bs uske quantity ko update karenge
+   if(snapshot.exists){
+   int currentQuantity=snapshot['productQuantity'];
+   int updateQuantity=currentQuantity + quantityIncrement;
+   double totalPrice=double.parse(widget.productModel.fullPrice)*updateQuantity;
+
+   await documentReference.update({
+   'productQuantity':updateQuantity,
+   'productTotalPrice':totalPrice,
+   });
+   print('product exist');
+
+   }else{
+   //jb hmara product exist nhi karta cart me tb use hme database me send karne ke liye
+   //this is a subcollaction
+   await FirebaseFirestore.instance.collection('cart').doc(uId).set({
+   'uId':uId,
+   'createdAt':DateTime.now(),
+   });
+   //yeh cart collaction ke andr ek aur collaction bnayega order
+
+   CartModel cartModel=CartModel(
+   productId: widget.productModel.productId,
+   categoryId: widget.productModel.categoryId,
+   productName: widget.productModel.productName,
+   categoryName: widget.productModel.categoryName,
+   salePrice: widget.productModel.salePrice,
+   fullPrice: widget.productModel.fullPrice,
+   productImages: widget.productModel.productImages,
+   deliveryTime: widget.productModel.deliveryTime,
+   isSale: widget.productModel.isSale,
+   productDescription: widget.productModel.productDescription,
+   createdAt: DateTime.now(),
+   updatedAt: DateTime.now(),
+   productQuantity: 1,
+   productTotalPrice: double.parse(widget.productModel.fullPrice),
+   );
+
+   await documentReference.set(cartModel.toMap());
+   print('product add');
+
+   }
+
+}
+
+Step 29 : (isSale fullprice me query lgana hai kyuki db me phle fullprice jaa rha tha )
+------------------------------------------------
+double totalPrice=
+double.parse(widget.productModel.isSale? widget.productModel.salePrice:widget.productModel.fullPrice)*updateQuantity;
+---------
+Step 30 :(Ab hme cart screen me data ko fetch karna hai)
+--------------------------------
+sabse phle hum body ke andr return karenge future.builder uske ander query lgayenge
+future: FirebaseFirestore.instance.collection('cart').doc(user!.uid).collection('CartOrders').get(),
+phir ek cartmodel ko add karenge phir cart model ke thruogh hum data ko show karenge 
+
+Step 31 :(Cart screen me se product ko kaise delete karte hai)
+----------------------------------------
+1. flutter_swipe_action_cell: es package ko add karna hai
+2. cart screen pr hmne ek card bnaya hai usko wrap kar denge SwipeActionCell(key:ObjectKey(cartModel.productId),child:Card());
+3. key: ObjectKey(cartModel.productId),
+   trailingActions: [
+   SwipeAction(
+   backgroundRadius: 10.0,
+   title: "Delete",
+   forceAlignmentToBoundary: true,
+   performsFirstActionWithFullSwipe: true,
+   onTap: (CompletionHandler handler) async{
+   print('delete');
+   await FirebaseFirestore.instance
+   .collection('cart')
+   .doc(user!.uid)
+   .collection('CartOrders')
+   .doc(cartModel.productId)
+   .delete();
+   })
+   ],
+4. agr hme real time changes dekhna hai to hme future.builder ki jgh strembuilder lena hoga and stream: get() ki jgh snapshot() pass karna hoga
+
+Step 32 : (How to increase and decrease product quantity )
+---------------------------------------------------------
+1. Sabse phle hme button ko wrap karna hoga gesturedetector widget se 
+   phir uske ontap method ke andr ek if condition dena hai 
+2.  if(cartModel.productQuantity>1){
+    await FirebaseFirestore.instance
+    .collection('cart')
+    .doc(user!.uid)
+    .collection('CartOrders')
+    .doc(cartModel.productId)
+    .update({
+    'productQuantity':cartModel.productQuantity-1,
+    'productTotalPrice':
+    (double.parse(cartModel.fullPrice)*
+    (cartModel.productQuantity-1)),
+    });
+    }
+3. if(cartModel.productQuantity>0){
+   await FirebaseFirestore.instance
+   .collection('cart')
+   .doc(user!.uid)
+   .collection('CartOrders')
+   .doc(cartModel.productId)
+   .update({
+   'productQuantity':cartModel.productQuantity+1,
+   'productTotalPrice':
+   double.parse(cartModel.fullPrice)+
+   double.parse(cartModel.fullPrice)*
+   (cartModel.productQuantity),
+   });
+   }
+
+Step 33 :(How to calculate cart products price)
+-----------------------------------------------
+1. ek controller bnana hoga  uske CartTotalPrice name ka uske andr ek Rx var bnana h and uske baad init() method bnana hai and uske baad ek
+   hme ek method bnana hai jiske andr hum user ke CartOrders ke all document ko fetch karenge
+   import 'package:cloud_firestore/cloud_firestore.dart';
+   import 'package:firebase_auth/firebase_auth.dart';
+   import 'package:get/get.dart';
+      
+      class ProductPriceController extends GetxController{
+      RxDouble totalPrice=0.0.obs;
+      User? user=FirebaseAuth.instance.currentUser;
+      
+      
+      @override
+      void onInit() {
+      fetchProductPrice();
+      super.onInit();
+      
+      }
+      
+      void fetchProductPrice() async{
+      final QuerySnapshot<Map<String,dynamic>> snapshot=
+      await FirebaseFirestore.instance
+      .collection('cart')
+      .doc(user!.uid)
+      .collection('CartOrders')
+      .get();
+      
+          double sum=0.0;
+      
+          for(final doc in snapshot.docs){
+            final data=doc.data();
+            //sab document ke andr se mujhe totalprice ki field chahiye
+            if(data!=null && data.containsKey('productTotalPrice')){
+              sum+=(data['productTotalPrice'] as num).toDouble();
+            }
+          }
+          totalPrice.value=sum;
+      }
+      }
+3. Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Obx(()=>Text("Total : ${productPriceController.totalPrice.value.toStringAsFixed(1)}",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,fontFamily: AppConstant.appFontFamily),),),
+    ),
+
+Step 34 : (How to make checkout page in flutter )
+-------------------------------------------------
+cart screen ko copy karenge and ek new screen bnayenge uska name denge checkoutscreen uske andr pura cart ke screen ko paste kar denge
+and uske andr se increement and decrement quantity ko htaa denge and conform button pr ek pop show karwayenge usme user ka data input 
+karwayenge jaise name address near by contact nu ye phir ek button bnayenge place order ka uspr click karne par user ka order confirm ho jayenge 
+and ek new collaction bnega conformorders ka jisme product rhega usme kuch 
+showCustomBottomSheet();
+bottomsheet ke ander hme inputfield bnana hai and ek button bnana hai
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

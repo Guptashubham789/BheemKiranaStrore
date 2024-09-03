@@ -46,7 +46,8 @@ dependencies:
   firebase_messaging:
   carousel_slider:
   cached_network_image:
-  image_card: 
+  image_card:
+  flutter_swipe_action_cell: ^3.1.4
 
 
 
