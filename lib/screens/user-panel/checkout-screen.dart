@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:groceryapp/controllers/get-customer-device-token.dart';
 import 'package:groceryapp/modals/cart-model.dart';
 import 'package:groceryapp/utils/app-constant.dart';
 
 import '../../controllers/cart-price-controller.dart';
+import '../../services/place-order-service.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -20,6 +22,10 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   User? user=FirebaseAuth.instance.currentUser;
   final ProductPriceController productPriceController=Get.put(ProductPriceController());
+  TextEditingController nameController=TextEditingController();
+  TextEditingController phoneController=TextEditingController();
+  TextEditingController nearByController=TextEditingController();
+  TextEditingController addressController=TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,8 +154,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ),
                   child: TextButton(
                     child: Text('Conform Order',style: TextStyle(color: AppConstant.appTextColor,fontFamily: AppConstant.appFontFamily,fontWeight: FontWeight.bold,fontSize: 13),),
-                    onPressed: (){
-                            showCustomBottomSheet();
+                    onPressed: () async{
+                           showCustomBottomSheet();
                     },
                   ),
                 ),
@@ -160,14 +166,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
   }
-}
-void showCustomBottomSheet(){
+
+void showCustomBottomSheet() {
   Get.bottomSheet(
     Container(
-      height: Get.height*0.8,
+      height: Get.height * 0.8,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(15.0))
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15.0))
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -178,14 +184,14 @@ void showCustomBottomSheet(){
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextFormField(
-                    // controller: username,
+                    controller:nameController,
                     textInputAction: TextInputAction.next,
                     cursorColor: AppConstant.appMainColor,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                         labelText: 'Name ',
                         prefixIcon: Icon(Icons.person),
-                        contentPadding: EdgeInsets.only(top: 20.0,left: 8.0),
+                        contentPadding: EdgeInsets.only(top: 20.0, left: 8.0),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         )
@@ -193,49 +199,49 @@ void showCustomBottomSheet(){
                   ),
                 )
             ),
-            SizedBox(height: Get.height/80,),
+            SizedBox(height: Get.height / 80,),
             Container(
                 margin: EdgeInsets.symmetric(horizontal: 5.0),
                 width: Get.width,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextFormField(
-                    // controller: userphone,
+                     controller: phoneController,
                     cursorColor: AppConstant.appMainColor,
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
                     decoration: InputDecoration(
                         labelText: 'Phone',
                         prefixIcon: Icon(Icons.phone),
-                        contentPadding: EdgeInsets.only(top: 20.0,left: 8.0),
+                        contentPadding: EdgeInsets.only(top: 20.0, left: 8.0),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         )
                     ),
                   ),
                 )),
-            SizedBox(height: Get.height/80,),
+            SizedBox(height: Get.height / 80,),
             Container(
                 margin: EdgeInsets.symmetric(horizontal: 5.0),
                 width: Get.width,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: TextFormField(
-                    // controller: usercity,
+                     controller: nearByController,
                     textInputAction: TextInputAction.next,
                     cursorColor: AppConstant.appMainColor,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
                         labelText: 'Near By ',
                         prefixIcon: Icon(Icons.pin_drop),
-                        contentPadding: EdgeInsets.only(top: 20.0,left: 8.0),
+                        contentPadding: EdgeInsets.only(top: 20.0, left: 8.0),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         )
                     ),
                   ),
                 )),
-            SizedBox(height: Get.height/80,),
+            SizedBox(height: Get.height / 80,),
             Container(
                 margin: EdgeInsets.symmetric(horizontal: 5.0),
                 width: Get.width,
@@ -244,35 +250,61 @@ void showCustomBottomSheet(){
                   child: TextFormField(
                     maxLines: 2,
                     textInputAction: TextInputAction.next,
-                    // controller: usercity,
+                    controller: addressController,
                     cursorColor: AppConstant.appMainColor,
                     keyboardType: TextInputType.text,
                     decoration: InputDecoration(
-                        labelText: 'Full Address',
-                        prefixIcon: Icon(Icons.pin_drop),
-                        contentPadding: EdgeInsets.only(top: 20.0,left: 8.0),
-                        border: OutlineInputBorder(
+                      labelText: 'Full Address',
+                      prefixIcon: Icon(Icons.pin_drop),
+                      contentPadding: EdgeInsets.only(top: 20.0, left: 8.0),
+                      border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                           borderSide: BorderSide(color: Colors.black)
-                        ),
+                      ),
 
                     ),
                   ),
                 )
             ),
-            SizedBox(height: Get.height/40,),
+            SizedBox(height: Get.height / 40,),
             Material(
               child: Container(
-                width: Get.width/1.3,
-                height: Get.height/12,
+                width: Get.width / 1.3,
+                height: Get.height / 12,
                 decoration: BoxDecoration(
                     color: AppConstant.appMainColor,
                     borderRadius: BorderRadius.circular(20.0)
                 ),
                 child: TextButton(
-                  child: Text('Place Orders',style: TextStyle(color: AppConstant.appTextColor),),
-                  onPressed: (){
-                    //Get.to(()=> SignScreen());
+                  child: Text('Place Orders',
+                    style: TextStyle(color: AppConstant.appTextColor),),
+                  onPressed: () async{
+                    if(nameController.text!='' && phoneController.text!='' && nearByController.text!='' && addressController.text!=''){
+                      String name=nameController.text.trim();
+                      String phone=phoneController.text.trim();
+                      String nearBy=nearByController.text.trim();
+                      String address=addressController.text.trim();
+
+                      String customerToken=await getCustomerDeviceToken();
+
+
+                      //place order services
+                      placeOrder(
+                        context:context,
+                        customerName:name,
+                        customerPhone:phone,
+                        customerNerBy:nearBy,
+                        customerAddress:address,
+                        customerDeviceToken:customerToken,
+                      );
+
+                    }else{
+                      Get.snackbar("Please", "please fill the all fields..",
+                        snackPosition: SnackPosition.TOP,backgroundColor: AppConstant.appMainColor,
+                        colorText: AppConstant.appTextColor,
+                        duration: Duration(seconds: 5),
+                      );
+                    }
                   },
                 ),
               ),
@@ -288,4 +320,5 @@ void showCustomBottomSheet(){
     enableDrag: true,
     elevation: 6,
   );
+}
 }
