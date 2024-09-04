@@ -9,6 +9,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:groceryapp/modals/cart-model.dart';
 import 'package:groceryapp/modals/product-model.dart';
 import 'package:groceryapp/utils/app-constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../controllers/banners-controller.dart';
 import 'cart-screen.dart';
@@ -147,7 +148,9 @@ class _SingleProductScreenState extends State<SingleProductScreen> {
                             child: TextButton(
                               child: Text('Whatsapp',style: TextStyle(color: AppConstant.appTextColor),),
                               onPressed: (){
-                                //Get.to(()=> SignScreen());
+                                sendMessageOnWhatsapp(
+                                  productModel:widget.productModel,
+                                );
                               },
                             ),
                           ),
@@ -163,6 +166,19 @@ class _SingleProductScreenState extends State<SingleProductScreen> {
         ),
       ),
     );
+  }
+  static Future<void> sendMessageOnWhatsapp({
+    required ProductModel productModel
+  }) async{
+    final number="+916393539704";
+    final message="Hello SGTech \n Grocery App \n i want to about this product \n${productModel.productName} \n ${productModel.productId}";
+    final url='https://wa.me/$number?text=${Uri.encodeComponent(message)}';
+
+    if(await canLaunchUrl(url as Uri)){
+      await launchUrl(url as Uri);
+    }else{
+      throw 'Could not launch $url';
+    }
   }
   //check product exist or not
 

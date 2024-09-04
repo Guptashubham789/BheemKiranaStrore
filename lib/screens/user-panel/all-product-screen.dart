@@ -18,8 +18,8 @@ class AllProductScreen extends StatelessWidget {
         backgroundColor: AppConstant.appMainColor,
         title: Text("All Product"),
       ),
-      body: FutureBuilder(
-          future: FirebaseFirestore.instance.collection('product').where('isSale',isEqualTo: false).get(),
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('product').where('isSale',isEqualTo: false).snapshots(),
           builder: (BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot){
             if(snapshot.hasError){
               return Center(

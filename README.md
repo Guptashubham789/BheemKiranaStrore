@@ -58,6 +58,72 @@ sabse phle SH keys genrate karna
 b9:ed:ba:46:ea:73:3d:20:09:03:9e:d0:8d:9b:12:5d:3b:17:a1:37
 Package ko import karna (google_sign_in)
 phir hme ek user ka model bnana hai and usme hme (userdevicetoken,isAdmin,isActive,createdOn) ye field lena compulesorry hai,
+1. ab hum ek controller bnayenge google-sign-in name esko hum welcome screen ke button par call karwayenge
+2.  google-sign-in-controller
+
+class GoogleSignInController extends GetxController{
+//jo maine package import kiya hai uska instance bnaa lenge
+final GoogleSignIn googleSignIn=GoogleSignIn();
+final FirebaseAuth _auth=FirebaseAuth.instance;
+
+
+      Future<void> signInWithGoogle() async{
+      final GetDeviceTokenController _getDeviceTokenController=Get.put(GetDeviceTokenController());
+      try{
+      final GoogleSignInAccount? googleSignInAccount=
+      await googleSignIn.signIn();
+      //yani ki jab acc apna select and click karwayenge to tb mai dekhna chah rha hu ki
+      //hmara acc empty to nhi hai
+      if(googleSignInAccount!=null){
+      EasyLoading.show(status: "Please wait..");
+      final GoogleSignInAuthentication googleSignInAuthentication=
+      await googleSignInAccount.authentication;
+      //jb user login kar rha hoga to uski creadential le lenge
+      //creadential method ke andr 2 chije req hoti h id token
+      final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken:googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+      );
+      //ab hme dekhna h user credential ki kya yah khali to nhi hai
+      final UserCredential userCredential=
+      await _auth.signInWithCredential(credential);
+      
+              //jo bhi user yha se login ho rha hoga to uski detaild usercredential me save ho jaayegi
+          final User? user=userCredential.user;
+
+          //ab hmara user yha tk aa jaye to hme condition lgana hoga
+
+        if(user != null){
+            Usermodel usermodel=Usermodel(
+                uId: user.uid,
+                username: user.displayName.toString(),
+                email: user.email.toString(),
+                phone: user.phoneNumber.toString(),
+                userImg: user.photoURL.toString(),
+                userDeviceToken: _getDeviceTokenController.deviceToken.toString(),
+                country: '',
+                userAddress: '',
+                street: '',
+                userCity: '',
+                isAdmin: false,
+                isActive: true,
+                createdOn: DateTime.now(),
+            );
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .set(usermodel.toMap());
+            EasyLoading.dismiss();
+            Get.offAll(()=> const MainScreens());
+        }
+      }
+    }catch(e){
+      EasyLoading.dismiss();
+      print("Error : $e");
+    }
+      }
+      
+      }
 
 Step 8: Controoller bnana hai GoogleSignIn name ka and use extends karna hoga GetxController se
 ---------------
@@ -469,6 +535,7 @@ Step 35 :(Placing an order in flutter Part-1 )
 
 
 4. hme ek service bnana hai genrate-order-id name ka uske andr hum unique order id ko fetch karenge
+   
    import 'dart:math';
 
    String genrateOrderId(){
@@ -478,6 +545,7 @@ Step 35 :(Placing an order in flutter Part-1 )
    String id='${now.microsecondsSinceEpoch}$randomNumber';
    return id;
    }
+
 5. and hum ek service bnayenge uske andr hum documnet ko fetch karenge ek ek karke and uske andr order id ko bhi k
    gate karenge. loop bhi lgana hai ek karke hme cartorder se data ko fetch karna hai
       
@@ -592,6 +660,41 @@ Step 35 :(Placing an order in flutter Part-1 )
       }
       
       }
+
+Step 36 :(Send message on whatsapp using flutter)
+--------------------------------------------------
+
+Step 37 :(How to fetch user orders from firebase )
+--------------------------------------------------
+1. sabse phle ek screen bnana hai and cart wale screen se pura copy karna hai and es wale screen me paste karna hai
+2. Ab hme yha orders ke collactio ke andr sub collaction ki query ko lgana hai and vha se data ko fetch karna hai 
+3. ab ek query lgana hai agr status false ho to pending dikhana hai agr status true ho to deleverd dikhana hai and ek delete ka button lgana hai
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

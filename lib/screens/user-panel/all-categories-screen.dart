@@ -25,8 +25,8 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
         backgroundColor: AppConstant.appMainColor,
         title: Text('All Categories'),
       ),
-      body: FutureBuilder(
-          future: FirebaseFirestore.instance.collection('categories').get(),
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('categories').snapshots(),
           builder: (BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot){
             if(snapshot.hasError){
               return Center(

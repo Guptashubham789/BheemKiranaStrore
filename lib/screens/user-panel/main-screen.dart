@@ -7,6 +7,7 @@ import 'package:groceryapp/screens/auth-ui/welcome-screen.dart';
 import 'package:groceryapp/screens/user-panel/all-categories-screen.dart';
 import 'package:groceryapp/screens/user-panel/all-flash-sale-product.dart';
 import 'package:groceryapp/screens/user-panel/cart-screen.dart';
+import 'package:groceryapp/screens/user-panel/user-profile.dart';
 import 'package:groceryapp/widgets/banners-widget.dart';
 import 'package:groceryapp/widgets/category-widget.dart';
 import 'package:groceryapp/widgets/custom-drawer-widget.dart';
@@ -32,6 +33,8 @@ class _MainScreensState extends State<MainScreens> {
         title: Text(AppConstant.appName),
         backgroundColor:AppConstant.appMainColor,
         actions: [
+
+
           GestureDetector(
             onTap: (){
               Get.to(()=>CartScreen());
@@ -39,6 +42,15 @@ class _MainScreensState extends State<MainScreens> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(Icons.shopping_cart),
+            ),
+          ),
+          GestureDetector(
+            onTap: (){
+              Get.to(()=>UserProfile());
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Icon(Icons.account_circle_rounded),
             ),
           ),
         ],

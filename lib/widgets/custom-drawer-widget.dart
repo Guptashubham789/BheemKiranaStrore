@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:groceryapp/utils/app-constant.dart';
 
 import '../screens/auth-ui/welcome-screen.dart';
+import '../screens/user-panel/all-orders-screen.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -15,6 +16,7 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
+  final user=FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
     return Padding(padding: EdgeInsets.only(top: Get.height/25),
@@ -30,12 +32,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 20.0),
             child: ListTile(
               titleAlignment: ListTileTitleAlignment.center,
-              title: Text("SGTech"),
-              subtitle: Text("Technology Pvt Ltd"),
+              title: Text(user!.displayName.toString()),
+
               leading: CircleAvatar(
-                radius: 22.0,
-                backgroundColor: AppConstant.appTextColor,
-                child: Text("S",style: TextStyle(color: Colors.white),),
+                radius: 20,
+                backgroundColor: AppConstant.appMainColor,
+                backgroundImage: NetworkImage(user!.photoURL.toString()),
               ),
             ),
           ),
@@ -64,17 +66,23 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding:  EdgeInsets.symmetric(horizontal: 20.0),
             child: ListTile(
+              onTap: (){
+                Get.to(()=>AllOrdersScreen());
+              },
               titleAlignment: ListTileTitleAlignment.center,
               title: Text("Orders"),
               leading: Icon(Icons.shopping_bag),
               trailing: Icon(Icons.arrow_forward),
+
             ),
+
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: ListTile(
+
               titleAlignment: ListTileTitleAlignment.center,
               title: Text("Contact"),
               leading: Icon(Icons.help),

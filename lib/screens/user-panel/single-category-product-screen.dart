@@ -27,8 +27,8 @@ class _AllSingleCategoryProductState extends State<AllSingleCategoryProduct> {
         backgroundColor: AppConstant.appMainColor,
         title: Text('Product'),
       ),
-      body: FutureBuilder(
-          future: FirebaseFirestore.instance.collection('product').where('categoryId',isEqualTo: widget.categoryId).get(),
+      body: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('product').where('categoryId',isEqualTo: widget.categoryId).snapshots(),
           builder: (BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot){
             if(snapshot.hasError){
               return Center(
