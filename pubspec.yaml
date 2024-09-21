@@ -49,6 +49,12 @@ dependencies:
   image_card:
   flutter_swipe_action_cell: ^3.1.4
   url_launcher:
+  image_picker:
+  device_info_plus:
+  intl:
+  permission_handler:
+  app_settings:
+  firebase_storage:
 
 
 

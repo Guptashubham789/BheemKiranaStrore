@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:groceryapp/screens/admin-panel/view/orders/all-user-orders-screen.dart';
+import 'package:groceryapp/screens/admin-panel/view/product/all-product-screen.dart';
 
 import '../../../utils/app-constant.dart';
 import '../../user-panel/all-orders-screen.dart';
@@ -84,6 +85,9 @@ class _AdminDrawerWidgetState extends State<AdminDrawerWidget> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: ListTile(
+                onTap: (){
+                  Get.to(()=>AllProductScreen());
+                },
                 titleAlignment: ListTileTitleAlignment.center,
                 title: Text("Product"),
                 leading: Icon(Icons.production_quantity_limits),

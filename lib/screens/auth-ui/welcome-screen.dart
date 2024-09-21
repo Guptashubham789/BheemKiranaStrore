@@ -25,53 +25,55 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         title: const Text('Welcome To The Grocery'),
         backgroundColor: AppConstant.appMainColor,
       ),
-      body: Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              child: Lottie.asset('assets/images/splash-icon2.json'),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 20),
-                child: Text('Happy Shopping!!',style: TextStyle(fontFamily: AppConstant.appFontFamily),)),
-            SizedBox(height: Get.height/12,),
-            Material(
-              child: Container(
-                width: Get.width/1.3,
-                height: Get.height/12,
-                decoration: BoxDecoration(
-                  color: AppConstant.appMainColor,
-                  borderRadius: BorderRadius.circular(20.0)
-                ),
-                child: TextButton.icon(
-                 label: Text('Sign in with Google',style: TextStyle(color: AppConstant.appTextColor),),
-                  onPressed: (){
-                   _googleSignInController.signInWithGoogle();
-                  },
-                  icon: Image.asset('assets/images/google.png',width: Get.width/12,height: Get.height/12,),
-                ),
+      body: SingleChildScrollView(
+        child: Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                child: Lottie.asset('assets/images/splash-icon2.json'),
               ),
-            ),
-            SizedBox(height: Get.height/20,),
-            Material(
-              child: Container(
-                width: Get.width/1.3,
-                height: Get.height/12,
-                decoration: BoxDecoration(
+              Container(
+                margin: EdgeInsets.only(top: 20),
+                  child: Text('Happy Shopping!!',style: TextStyle(fontFamily: AppConstant.appFontFamily),)),
+              SizedBox(height: Get.height/12,),
+              Material(
+                child: Container(
+                  width: Get.width/1.3,
+                  height: Get.height/12,
+                  decoration: BoxDecoration(
                     color: AppConstant.appMainColor,
                     borderRadius: BorderRadius.circular(20.0)
-                ),
-                child: TextButton.icon(
-                  label: Text('Sign in with Email',style: TextStyle(color: AppConstant.appTextColor),),
-                  onPressed: (){
-                    Get.to(()=> SignScreen());
-                  },
-                  icon: Image.asset('assets/images/gmail.png',width: Get.width/12,height: Get.height/12,),
+                  ),
+                  child: TextButton.icon(
+                   label: Text('Sign in with Google',style: TextStyle(color: AppConstant.appTextColor),),
+                    onPressed: (){
+                     _googleSignInController.signInWithGoogle();
+                    },
+                    icon: Image.asset('assets/images/google.png',width: Get.width/12,height: Get.height/12,),
+                  ),
                 ),
               ),
-            )
-          ],
+              SizedBox(height: Get.height/20,),
+              Material(
+                child: Container(
+                  width: Get.width/1.3,
+                  height: Get.height/12,
+                  decoration: BoxDecoration(
+                      color: AppConstant.appMainColor,
+                      borderRadius: BorderRadius.circular(20.0)
+                  ),
+                  child: TextButton.icon(
+                    label: Text('Sign in with Email',style: TextStyle(color: AppConstant.appTextColor),),
+                    onPressed: (){
+                      Get.to(()=> SignScreen());
+                    },
+                    icon: Image.asset('assets/images/gmail.png',width: Get.width/12,height: Get.height/12,),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
